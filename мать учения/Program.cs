@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-
+﻿
 string[] firstNames = ["James", "Jonathan", "Stan", "Dean", "Sam", "Shone"];
 string[] lastNames = ["Winchester", "Joestar", "Lee"];
 Random random = new();
@@ -22,42 +21,34 @@ var persons = Enumerable
     })
     .ToList();
 
-
-var mapped = Map(persons);
+var mapped = await Map(persons);
 
 Console.WriteLine(mapped.Count);
 
-
-List<IntegrationPerson> Map(List<InternalPerson> source)
+async Task<List<IntegrationPerson>> Map(List<InternalPerson> source)
 {
-    var integrationPersons = new List<IntegrationPerson>(source.Count);
-    
-    Parallel.For(0, source.Count, i =>
+    var tasks = source.Select(person =>
     {
-        var person = source[i];
-        Qualification qualificationEnum;
-        
-        if (!Enum.TryParse(person.Qualification, true, out qualificationEnum))
+        return Task.Run(() =>
         {
-            qualificationEnum = Qualification.Junior; 
-        }
-        var integrationPerson = new IntegrationPerson
-        {
-            Id = person.Id.ToString(),
-            Age = person.Age,
-            FullName = person.FirstName + ' ' + person.LastName,
-            Qualification = qualificationEnum
-        };
-        
-        lock (integrationPersons) 
-        {
-            integrationPersons.Add(integrationPerson);
-        }
-    });
-
-    return integrationPersons;
+            if (!Enum.TryParse(person.Qualification, true, out Qualification qualificationEnum))
+            {
+                qualificationEnum = Qualification.Junior;
+            }
+            return new IntegrationPerson
+            {
+                Id = person.Id.ToString(),
+                FullName = person.FirstName + ' ' + person.LastName,
+                Age = person.Age,
+                Qualification = qualificationEnum
+            };
+        });
+    }).ToList();
+    
+    var results = await Task.WhenAll(tasks);
+    
+    return results.ToList();
 }
-
 
 class InternalPerson
 {

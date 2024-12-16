@@ -12,3 +12,4 @@ C:\Users\Федор\RiderProjects\мать учения\мать учения\ob
 C:\Users\Федор\RiderProjects\мать учения\мать учения\obj\Debug\net8.0\мать учения.pdb
 C:\Users\Федор\RiderProjects\мать учения\мать учения\obj\Debug\net8.0\мать учения.genruntimeconfig.cache
 C:\Users\Федор\RiderProjects\мать учения\мать учения\obj\Debug\net8.0\ref\мать учения.dll
+C:\Users\Федор\RiderProjects\мать учения\мать учения\obj\Debug\net8.0\мать учения.sourcelink.json
