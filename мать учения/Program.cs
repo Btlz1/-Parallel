@@ -1,18 +1,24 @@
-﻿var semaphore = new SemaphoreSlim(1, 1);
-var tasks = Enumerable.Range(0, 100).Select(WriteInFile);
+﻿Console.WriteLine("Press enter to stop...");
 
-await Task.WhenAll(tasks);
+await WorkerFactory.CreateWorkerAndStart();
 
-async Task WriteInFile(int i)
+Console.WriteLine("Program ended.");
+
+static class WorkerFactory
 {
-    await semaphore.WaitAsync(); 
-    try
+    public static Task CreateWorkerAndStart()
     {
-        await using StreamWriter writer = new("ouptput.txt", append: true);
-        await writer.WriteLineAsync(i.ToString());
-    }
-    finally
-    {
-        semaphore.Release(); 
+        CancellationTokenSource cts = new(1000);
+        var worker = Task.Run(async () =>
+        {
+            while (!cts.Token.IsCancellationRequested)
+            {
+                Console.WriteLine("Do something...");
+                await Task.Delay(1000, cts.Token);
+            }
+            Console.WriteLine("Worker done.");
+        });
+
+        return worker;
     }
 }
